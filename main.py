@@ -31,6 +31,15 @@ counter = 0
 user_typed_words = []
 
 
+def get_highest_score():
+    try:
+        with open("data.txt",) as file_name:
+            highest_score=int(file_name.read())
+    except ValueError:
+        highest_score=0
+    return highest_score
+
+
 def check_typing_speed():
     correct_spelled_words = ""
     for _ in range(len(user_typed_words)):
@@ -40,6 +49,10 @@ def check_typing_speed():
     score_field = tk.Label(frame, borderwidth=15, text=f"Your typing speed is: {math.ceil(speed)} WPM", relief=tk.FLAT,
                            font=("Arial", 20, "bold"), width=30, bg="white", fg="#579BB1")
     score_field.grid(row=2, column=1)
+    canvas.itemconfig(highest_value, text=f"Highest Score: {get_highest_score()} WPN")
+    if math.ceil(speed)>get_highest_score():
+        with open("data.txt","w") as filename:
+            filename.write(str(math.ceil(speed)))
 
 
 def space_pressed(event):
@@ -60,7 +73,7 @@ def start_timer(seconds):
         else:
             timer_data = f"00:{seconds}"
         canvas.itemconfig(timer_text, text=timer_data)
-        timer_update=window.after(1000, start_timer, seconds)
+        timer_update=window.after(100, start_timer, seconds)
     if seconds == 0:
         check_typing_speed()
 
@@ -83,6 +96,7 @@ def restart_test():
     typing_field.delete(0, "end")
     canvas.itemconfig(timer_text,text="01:00")
     canvas.itemconfig(text_words,text=print_text())
+    canvas.itemconfig(highest_value,text=f"Highest Score: {get_highest_score()} WPN")
     typing_field = tk.Entry(frame, borderwidth=15, relief=tk.FLAT,
                             font=("Arial", 20, "bold"), width=30, bg="white", fg="#579BB1")
     typing_field.grid(row=2, column=1)
@@ -108,14 +122,15 @@ def print_text():
 window = tk.Tk()
 window.geometry("980x630")
 window.title("Typing Speed Test")
-window.config(bg="#579BB1", pady=10, padx=20)
+window.config(bg="#6db6ec", pady=10, padx=20)
 
 random.shuffle(COMMON_WORDS)
 text = print_text()
-canvas = tk.Canvas(window, width=950, height=400, bg='#579BB1', highlightthickness=0)
-label_title = tk.Label(window, text="Typing Speed Test", bg="#579BB1", fg="#FFE9B1", font=(FONT, 30,))
+canvas = tk.Canvas(window, width=950, height=400, bg='#6db6ec', highlightthickness=0)
+label_title = tk.Label(window, text="Typing Speed Test", bg="#6db6ec", fg="#FFE9B1", font=("Ubuntu", 30,))
 label_title.grid(row=0, columnspan=2)
-timer_text = canvas.create_text(870, 20, text="01:00", fill="#5FD068", font=(FONT, 24, "bold"),tags="timer_text")
+timer_text = canvas.create_text(870, 20, text="01:00", fill="#f0cb74", font=(FONT, 24, "bold"),tags="timer_text")
+highest_value = canvas.create_text(190, 20, text=f"Highest Score: {get_highest_score()} WPN", fill="#f0cb74", font=(FONT, 24, "bold"),tags="timer_text")
 text_words = canvas.create_text(500, 230, text=text, fill="white", font=("Courier", 22, "bold"))
 canvas.grid(column=1, row=1)
 frame = tk.Frame(window, borderwidth=5, relief=tk.SUNKEN)
